@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 from openai import OpenAI, OpenAIError
 import requests
@@ -18,7 +19,10 @@ if uploaded_image is not None and uploaded_mask is not None:
     if st.button("Edit Image"):
         with st.spinner("Editing image..."):
             try:
-                client = OpenAI(api_key="REPLACE WITH YOUR API KEY")
+                # Access the API key from Streamlit environment variables
+                api_key = st.secrets["openai_api_key"]
+
+                client = OpenAI(api_key=api_key)
 
                 # Read the uploaded image and mask data as bytes
                 image_data = uploaded_image.read()
@@ -41,6 +45,8 @@ if uploaded_image is not None and uploaded_mask is not None:
 
             except OpenAIError as e:
                 st.error(f"An error occurred: {str(e)}")
+            except KeyError:
+                st.error("OpenAI API key is not set. Please set it in Streamlit's advanced settings.")
 
 else:
     st.write("Please upload both an image and a mask.")
