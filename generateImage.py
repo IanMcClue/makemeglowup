@@ -7,7 +7,7 @@ from PIL import Image
 st.title("Image Editing App")
 
 # Load OpenAI API key from secrets.toml
-openai_api_key = st.secrets["openai"]["api_key"]
+openai_api_key = st.secrets["OPENAI_API_KEY"]
 
 # Upload image and mask
 uploaded_image = st.file_uploader("Upload an image", type="png")
