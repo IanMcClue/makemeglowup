@@ -18,10 +18,12 @@ st.write("Upload an image to generate its variations using OpenAI's DALL-E.")
 # Image upload
 uploaded_image = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
 
-# Convert uploaded image to PNG format
-def convert_to_png(image):
+# Convert uploaded image to PNG format and resize it
+def convert_to_png(image, max_size=2048):
     img = Image.open(image)
     img = img.convert("RGBA")
+    # Resize image
+    img.thumbnail((max_size, max_size))
     with BytesIO() as f:
         img.save(f, format="PNG")
         return f.getvalue()
@@ -36,9 +38,10 @@ def generate_variations(image_data, n=1, size="1024x1024"):
             size=size,
             response_format="url"
         )
-        return response['data']
+        return response['data'] or []
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
+        return []
 
 if uploaded_image is not None:
     st.image(uploaded_image, caption='Uploaded Image', use_column_width=True)
