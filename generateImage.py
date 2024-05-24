@@ -9,6 +9,9 @@ import base64
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 openai.api_key = openai_api_key
 
+# Initialize OpenAI client
+client = openai.Api()
+
 st.title("Image Variation Generator")
 st.write("Upload an image to generate its variations using OpenAI's DALL-E.")
 
@@ -25,7 +28,6 @@ def convert_to_png(image):
 
 # Function to call OpenAI API for image variations
 def generate_variations(image_data, n=1, size="1024x1024"):
-    client = openai.OpenAI()
     response = client.images.create_variation(
         model="dall-e-2",
         image=image_data,
