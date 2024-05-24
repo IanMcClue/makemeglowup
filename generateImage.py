@@ -4,19 +4,23 @@ import numpy as np
 import requests
 from PIL import Image
 import base64
-import os
+import io
 
 # Load OpenAI API key from secrets.toml
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 MODEL = "gpt-4o"
-client = openai.Client()
+client = openai.Client(api_key=openai_api_key)
 
-def analyze_image(image_path):
+def analyze_image(image):
     client = openai.Client()
 
+    # Convert the image to bytes
+    buffer = io.BytesIO()
+    image.save(buffer, format="JPEG")
+    image_bytes = buffer.getvalue()
+
     # Encode the image as base64
-    with open(image_path, "rb") as image_file:
-        image_base64 = base64.b64encode(image_file.read()).decode("utf-8")
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
     image_url = f"data:image/jpeg;base64,{image_base64}"
 
     # Create a completion using the GPT-4o model
@@ -38,17 +42,17 @@ def analyze_image(image_path):
 
     return mood, color_choice
 
-
 def generate_image(emotion, color_choice):
-    # Create an image using the DALL-E 3 model
-    response = client.images.generate(
+    # Create an image using the DALL-E 2 model
+    response = client.images.create(
         prompt=f"{emotion} {color_choice} aura",
-        model="dalle3",
+        n=1,
+        size="1024x1024",
         response_format="b64_json",
     )
 
     # Decode the image from base64 and return it
-    image_base64 = response.choices[0].data.b64_json
+    image_base64 = response.data[0].b64_json
     image = base64.b64decode(image_base64)
 
     return image
@@ -62,9 +66,14 @@ if image_file:
     # Load the image using PIL
     image = Image.open(image_file)
 
+    # Resize the image to be square and less than 4MB
+    size = 1024  # Fixed size that is less than 4MB
+    image = image.resize((size, size))
+    image = image.convert("RGB")
+
     # Display the original image
     st.subheader("Original Image")
-    st.image(image)
+    st.image(image, use_column_width=True)
 
     # Analyze the image
     mood, color_choice = analyze_image(image)
@@ -82,7 +91,7 @@ if image_file:
 
     # Display the aura image
     st.subheader("Aura Image")
-    st.image(aura_image)
+    st.image(aura_image, use_column_width=True)
 
     # Save the aura image
     aura_image.save("aura_image.png")
