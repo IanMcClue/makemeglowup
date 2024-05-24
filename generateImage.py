@@ -27,14 +27,10 @@ if uploaded_file is not None:
 
     # Resize the image to be square and less than 4MB
     size = min(image.size)
-    while os.path.getsize(uploaded_file.name) > 4 * 1024 * 1024:
+    while len(uploaded_file) > 4 * 1024 * 1024:
         size -= 100
         image = image.resize((size, size))
-    image = image.resize((size, size))
-
-    # Convert the image to PNG if necessary
-    if uploaded_file.type not in ["png"]:
-        image = image.convert("RGB")
+    image = image.convert("RGB")
 
     # Convert the image to bytes
     image_bytes = io.BytesIO()
