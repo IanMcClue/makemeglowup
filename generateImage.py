@@ -47,15 +47,15 @@ if uploaded_file is not None:
     )
 
     # Display the variation images
-    for i, variation in enumerate(variation_response["data"]):
-        url = variation["url"]
+    for i, variation in enumerate(variation_response.data):
+        url = variation.url
         st.image(url, caption=f'Variation {i+1}', use_column_width=True)
 
     # Save the variation images to disk
     image_dir = "variation_images"  # The directory where the images will be saved
     if not os.path.exists(image_dir):
         os.makedirs(image_dir)
-    variation_urls = [datum["url"] for datum in variation_response["data"]]  # Extract URLs
+    variation_urls = [datum.url for datum in variation_response.data]  # Extract URLs
     variation_images = [requests.get(url).content for url in variation_urls]  # Download images
     variation_image_names = [f"variation_image_{i}.png" for i in range(len(variation_images))]  # Create names
     variation_image_filepaths = [os.path.join(image_dir, name) for name in variation_image_names]  # Create filepaths
