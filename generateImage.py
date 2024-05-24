@@ -17,8 +17,8 @@ uploaded_mask = st.file_uploader("Upload a mask", type="png")
 if uploaded_image is not None and uploaded_mask is not None:
     # Resize the uploaded images to reduce their file size
     max_size = (1024, 1024)
-    resized_image = Image.open(io.BytesIO(uploaded_image.read()))).resize(max_size)
-    resized_mask = Image.open(io.BytesIO(uploaded_mask.read()))).resize(max_size)
+    resized_image = Image.open(io.BytesIO(uploaded_image.read())).resize(max_size)
+    resized_mask = Image.open(io.BytesIO(uploaded_mask.read())).resize(max_size)
 
     st.image(resized_image, caption="Uploaded Image", width=300)
     st.image(resized_mask, caption="Uploaded Mask", width=300)
