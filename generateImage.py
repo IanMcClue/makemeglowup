@@ -38,7 +38,7 @@ def generate_variations(image_data, n=1, size="1024x1024"):
             size=size,
             response_format="url"
         )
-        return response['data'] or []
+        return response.data or []
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
         return []
