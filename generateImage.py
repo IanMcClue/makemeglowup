@@ -5,12 +5,12 @@ from PIL import Image
 from io import BytesIO
 import base64
 
-# Load OpenAI API key from secrets.toml
+# Load OpenAI API key from .streamlit/credentials.toml
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 openai.api_key = openai_api_key
 
 # Initialize OpenAI client
-client = openai.Api()
+client = openai.Client()
 
 st.title("Image Variation Generator")
 st.write("Upload an image to generate its variations using OpenAI's DALL-E.")
@@ -28,18 +28,21 @@ def convert_to_png(image):
 
 # Function to call OpenAI API for image variations
 def generate_variations(image_data, n=1, size="1024x1024"):
-    response = client.images.create_variation(
-        model="dall-e-2",
-        image=image_data,
-        n=n,
-        size=size,
-        response_format="url"
-    )
-    return response['data']
+    try:
+        response = client.images.create_variation(
+            model="dall-e-2",
+            image=image_data,
+            n=n,
+            size=size,
+            response_format="url"
+        )
+        return response['data']
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
 
 if uploaded_image is not None:
     st.image(uploaded_image, caption='Uploaded Image', use_column_width=True)
-    
+
     with st.spinner("Generating variations..."):
         image_data = convert_to_png(uploaded_image)
         variations = generate_variations(image_data)
