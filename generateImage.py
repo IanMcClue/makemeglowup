@@ -22,10 +22,8 @@ if uploaded_image is not None and uploaded_mask is not None:
     if st.button("Edit Image"):
         with st.spinner("Editing image..."):
             try:
-                # Access the API key from Streamlit environment variables
-                api_key = st.secrets["openai_api_key"]
-
-                client = OpenAI(api_key=api_key)
+                # Use the previously loaded OpenAI API key
+                client = OpenAI(api_key=openai_api_key)
 
                 # Read the uploaded image and mask data as bytes
                 image_data = uploaded_image.read()
@@ -53,3 +51,4 @@ if uploaded_image is not None and uploaded_mask is not None:
 
 else:
     st.write("Please upload both an image and a mask.")
+
