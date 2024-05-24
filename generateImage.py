@@ -1,6 +1,10 @@
 import streamlit as st
 import openai
+import numpy as np
+import requests
+from PIL import Image
 import base64
+import os
 
 # Set the API key and model name
 openai.api_key = st.secrets["openai_api_key"]
@@ -40,7 +44,7 @@ def generate_image(emotion, color_choice):
         prompt=f"{emotion} {color_choice} aura",
         model="dalle3",
         response_format="b64_json",
-        image_url=[{"type": "image_url", "image_url": image_url}] # <-- fixed
+        image_url=[{"type": "image_url", "image_url": image_url}]], # <-- fixed
     )
 
     # Decode the image from base64 and return it
@@ -52,4 +56,4 @@ def generate_image(emotion, color_choice):
 st.title("Make Me Glow Up")
 
 # Upload an image of a person
-image_file = st.file_uploader("Upload an image of a person", type=["jpg", "
+image_file = st.file_uploader("Upload an image of a person", type=["jpg", "jpeg", "png"])
