@@ -29,14 +29,14 @@ def convert_to_png(image, max_size=2048):
         return f.getvalue()
 
 # Function to call OpenAI API for image variations
-def generate_variations(image_data, n=1, size="1024x1024"):
+def generate_variations(image_data, n=1, size="1024x1024", response_format="url"):
     try:
         response = client.images.create_variation(
             model="dall-e-2",
             image=image_data,
             n=n,
             size=size,
-            response_format="url"
+            response_format=response_format
         )
         return response.data or []
     except Exception as e:
