@@ -42,7 +42,7 @@ if uploaded_image is not None and uploaded_mask is not None:
                 mask_bytes.seek(0)
 
                 response = client.images.edit(
-                    model="dall-e-3"
+                    model="dall-e-3",
                     image=image_bytes,
                     mask=mask_bytes,
                     prompt=prompt_input,
