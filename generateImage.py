@@ -11,9 +11,12 @@ openai.api_key = st.secrets["openai_api_key"]
 MODEL = "gpt-4o"
 client = openai.Client()
 
-def analyze_image(image):
+def analyze_image(image_path):
+    client = openai.Client()
+
     # Encode the image as base64
-    image_base64 = base64.b64encode(image).decode("utf-8")
+    with open(image_path, "rb") as image_file:
+        image_base64 = base64.b64encode(image_file.read()).decode("utf-8")
     image_url = f"data:image/jpeg;base64,{image_base64}"
 
     # Create a completion using the GPT-4o model
@@ -23,8 +26,8 @@ def analyze_image(image):
             {"role": "system", "content": "You are a helpful assistant that describes the mood and color of a person in the image."},
             {"role": "user", "content": [
                 {"type": "text", "text": "Describe the mood and color of the person in the image."},
-                {"type": "image_url", "image_url": {"url": image_url}}},
-            ]},
+                {"type": "image_url", "image_url": image_url}  # Corrected this line
+            ]}
         ],
         temperature=0.0,
     )
@@ -34,6 +37,7 @@ def analyze_image(image):
     color_choice = completion.choices[0].message.content.split("\n")[1].split(": ")[1]
 
     return mood, color_choice
+
 
 def generate_image(emotion, color_choice):
     # Create an image using the DALL-E 3 model
