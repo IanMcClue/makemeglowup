@@ -1,66 +1,58 @@
-import os
 import streamlit as st
-from openai import OpenAI, OpenAIError
+import openai
 import requests
 from PIL import Image
-import io
-
-st.title("Image Editing App")
+from io import BytesIO
+import base64
 
 # Load OpenAI API key from secrets.toml
 openai_api_key = st.secrets["OPENAI_API_KEY"]
+openai.api_key = openai_api_key
 
-# Upload image and mask
-uploaded_image = st.file_uploader("Upload an image", type="png")
-uploaded_mask = st.file_uploader("Upload a mask", type="png")
+st.title("Image Variation Generator")
+st.write("Upload an image to generate its variations using OpenAI's DALL-E.")
 
-if uploaded_image is not None and uploaded_mask is not None:
-    # Resize the uploaded images to reduce their file size
-    max_size = (1024, 1024)
-    resized_image = Image.open(io.BytesIO(uploaded_image.read())).resize(max_size)
-    resized_mask = Image.open(io.BytesIO(uploaded_mask.read())).resize(max_size)
+# Image upload
+uploaded_image = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
 
-    st.image(resized_image, caption="Uploaded Image", width=300)
-    st.image(resized_mask, caption="Uploaded Mask", width=300)
+# Convert uploaded image to PNG format
+def convert_to_png(image):
+    img = Image.open(image)
+    img = img.convert("RGBA")
+    with BytesIO() as f:
+        img.save(f, format="PNG")
+        return f.getvalue()
 
-    prompt_input = st.text_input("Enter prompt:", value="", max_chars=100)
+# Function to call OpenAI API for image variations
+def generate_variations(image_data, n=1, size="1024x1024"):
+    client = openai.OpenAI()
+    response = client.images.create_variation(
+        model="dall-e-2",
+        image=image_data,
+        n=n,
+        size=size,
+        response_format="url"
+    )
+    return response['data']
 
-    # Edit the image using OpenAI
-    if st.button("Edit Image"):
-        with st.spinner("Editing image..."):
-            try:
-                # Use the previously loaded OpenAI API key
-                client = OpenAI(api_key=openai_api_key)
+if uploaded_image is not None:
+    st.image(uploaded_image, caption='Uploaded Image', use_column_width=True)
+    
+    with st.spinner("Generating variations..."):
+        image_data = convert_to_png(uploaded_image)
+        variations = generate_variations(image_data)
 
-                # Convert the resized image and mask to bytes and send them to the OpenAI API
-                image_bytes = io.BytesIO()
-                resized_image.save(image_bytes, format="PNG")
-                image_bytes.seek(0)
+    st.write("Generated Variations:")
+    for i, variation in enumerate(variations):
+        variation_url = variation['url']
+        response = requests.get(variation_url)
+        img = Image.open(BytesIO(response.content))
+        st.image(img, caption=f'Variation {i+1}', use_column_width=True)
 
-                mask_bytes = io.BytesIO()
-                resized_mask.save(mask_bytes, format="PNG")
-                mask_bytes.seek(0)
-
-                response = client.images.edit(
-                    model="dall-e-3",
-                    image=image_bytes,
-                    mask=mask_bytes,
-                    prompt=prompt_input,
-                    n=1,
-                    size="1024x1024",
-                    response_format="url",
-                )
-
-                # Access the generated image URL
-                edited_image_url = response.data[0].url
-
-                # Display the edited image
-                st.image(edited_image_url, caption="Edited Image", width=300)
-
-            except OpenAIError as e:
-                st.error(f"An error occurred: {str(e)}")
-            except KeyError:
-                st.error("OpenAI API key is not set. Please set it in Streamlit's advanced settings.")
-
-else:
-    st.write("Please upload both an image and a mask.")
+        # Provide download link
+        buffered = BytesIO()
+        img.save(buffered, format="PNG")
+        img_data = buffered.getvalue()
+        b64 = base64.b64encode(img_data).decode()
+        href = f'<a href="data:file/png;base64,{b64}" download="variation_{i+1}.png">Download Variation {i+1}</a>'
+        st.markdown(href, unsafe_allow_html=True)
