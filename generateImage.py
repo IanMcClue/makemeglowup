@@ -47,5 +47,6 @@ if uploaded_file is not None:
     )
 
     # Display the variation images
-    for i, url in enumerate(variation_response["data"]):
+    for i, variation in enumerate(variation_response["data"]):
+        url = variation["url"]
         st.image(url, caption=f'Variation {i+1}', use_column_width=True)
