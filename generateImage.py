@@ -12,8 +12,6 @@ MODEL = "gpt-4o"
 client = openai.Client(api_key=openai_api_key)
 
 def analyze_image(image):
-    client = openai.Client()
-
     # Convert the image to bytes
     buffer = io.BytesIO()
     image.save(buffer, format="JPEG")
@@ -24,21 +22,22 @@ def analyze_image(image):
     image_url = f"data:image/jpeg;base64,{image_base64}"
 
     # Create a completion using the GPT-4o model
-    completion = client.chat.completions.create(
+    messages = [
+        {"role": "system", "content": "You are a helpful assistant that describes the mood and color of a person in the image."},
+        {"role": "user", "content": [
+            {"type": "text", "text": "Describe the mood and color of the person in the image."},
+            {"type": "image_url", "image_url": image_url}
+        ]}
+    ]
+    response = client.chat.completions.create(
         model=MODEL,
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant that describes the mood and color of a person in the image."},
-            {"role": "user", "content": [
-                {"type": "text", "text": "Describe the mood and color of the person in the image."},
-                {"type": "image_url", "image_url": image_url}  # Corrected this line
-            ]}
-        ],
+        messages=messages,
         temperature=0.0,
     )
 
     # Extract the mood and color from the completion
-    mood = completion.choices[0].message.content.split("\n")[0].split(": ")[1]
-    color_choice = completion.choices[0].message.content.split("\n")[1].split(": ")[1]
+    mood = response.choices[0].message.content.split("\n")[0].split(": ")[1]
+    color_choice = response.choices[0].message.content.split("\n")[1].split(": ")[1]
 
     return mood, color_choice
 
