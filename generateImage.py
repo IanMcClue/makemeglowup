@@ -3,6 +3,7 @@ import streamlit as st
 from openai import OpenAI, OpenAIError
 import requests
 from PIL import Image
+import io
 
 st.title("Image Editing App")
 
@@ -16,15 +17,8 @@ uploaded_mask = st.file_uploader("Upload a mask", type="png")
 if uploaded_image is not None and uploaded_mask is not None:
     # Resize the uploaded images to reduce their file size
     max_size = (1024, 1024)
-    resized_image = uploaded_image.read().decode("utf-8")
-    image = Image.open(resized_image)
-    image.thumbnail(max_size)
-    resized_image = image.tobytes()
-
-    resized_mask = uploaded_mask.read().decode("utf-8")
-    mask = Image.open(resized_mask)
-    mask.thumbnail(max_size)
-    resized_mask = mask.tobytes()
+    resized_image = Image.open(io.BytesIO(uploaded_image.read()))).resize(max_size)
+    resized_mask = Image.open(io.BytesIO(uploaded_mask.read()))).resize(max_size)
 
     st.image(resized_image, caption="Uploaded Image", width=300)
     st.image(resized_mask, caption="Uploaded Mask", width=300)
@@ -37,10 +31,18 @@ if uploaded_image is not None and uploaded_mask is not None:
                 # Use the previously loaded OpenAI API key
                 client = OpenAI(api_key=openai_api_key)
 
-                # Send the resized image and mask data to the OpenAI API
+                # Convert the resized images to bytes and send them to the OpenAI API
+                image_bytes = io.BytesIO()
+                resized_image.save(image_bytes, format="PNG")
+                image_bytes.seek(0)
+
+                mask_bytes = io.BytesIO()
+                resized_mask.save(mask_bytes, format="PNG")
+                mask_bytes.seek(0)
+
                 response = client.images.edit(
-                    image=resized_image,
-                    mask=resized_mask,
+                    image=image_bytes,
+                    mask=mask_bytes,
                     prompt=prompt_input,
                     n=1,
                     size="1024x1024",
