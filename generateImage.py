@@ -1,68 +1,65 @@
+import os
 import streamlit as st
-import openai
+from openai import OpenAI, OpenAIError
 import requests
 from PIL import Image
 import io
-import os
+
+st.title("Image Editing App")
 
 # Load OpenAI API key from secrets.toml
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 
-# Create a client for the OpenAI API
-client = openai.Client(api_key=openai_api_key)
+# Upload image and mask
+uploaded_image = st.file_uploader("Upload an image", type="png")
+uploaded_mask = st.file_uploader("Upload a mask", type="png")
 
-# Create a file uploader
-uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
+if uploaded_image is not None and uploaded_mask is not None:
+    # Resize the uploaded images to reduce their file size
+    max_size = (1024, 1024)
+    resized_image = Image.open(io.BytesIO(uploaded_image.read())).resize(max_size)
+    resized_mask = Image.open(io.BytesIO(uploaded_mask.read())).resize(max_size)
 
-# Create a number input for the number of variations
-num_variations = st.number_input("Number of variations", min_value=1, max_value=10, value=2)
+    st.image(resized_image, caption="Uploaded Image", width=300)
+    st.image(resized_mask, caption="Uploaded Mask", width=300)
 
-# Create a selectbox for the size of the variations
-size_options = ["256x256", "512x512", "1024x1024"]
-variation_size = st.selectbox("Size of variations", size_options)
+    prompt_input = st.text_input("Enter prompt:", value="", max_chars=100)
 
-if uploaded_file is not None:
-    # Read the image file
-    image = Image.open(uploaded_file)
+    # Edit the image using OpenAI
+    if st.button("Edit Image"):
+        with st.spinner("Editing image..."):
+            try:
+                # Use the previously loaded OpenAI API key
+                client = OpenAI(api_key=openai_api_key)
 
-    # Resize the image to be square and less than 4MB
-    size = 1024  # Fixed size that is less than 4MB
-    image = image.resize((size, size))
-    image = image.convert("RGB")
+                # Convert the resized image and mask to bytes and send them to the OpenAI API
+                image_bytes = io.BytesIO()
+                resized_image.save(image_bytes, format="PNG")
+                image_bytes.seek(0)
 
-    # Convert the image to bytes
-    image_bytes = io.BytesIO()
-    image.save(image_bytes, format="PNG")
-    image_bytes.seek(0)
+                mask_bytes = io.BytesIO()
+                resized_mask.save(mask_bytes, format="PNG")
+                mask_bytes.seek(0)
 
-    # Display the original image
-    st.image(image, caption='Original Image', use_column_width=True)
+                response = client.images.edit(
+                    image=image_bytes,
+                    mask=mask_bytes,
+                    prompt=prompt_input,
+                    n=1,
+                    size="1024x1024",
+                    response_format="url",
+                )
 
-    # Use the OpenAI API to create image variations
-    variation_response = client.images.create_variation(
-        image=image_bytes,
-        n=num_variations,
-        size=variation_size,
-        response_format="url",
-    )
+                # Access the generated image URL
+                edited_image_url = response.data[0].url
 
-    # Display the variation images
-    for i, variation in enumerate(variation_response.data):
-        url = variation.url
-        st.image(url, caption=f'Variation {i+1}', use_column_width=True)
+                # Display the edited image
+                st.image(edited_image_url, caption="Edited Image", width=300)
 
-    # Save the variation images to disk
-    image_dir = "variation_images"  # The directory where the images will be saved
-    if not os.path.exists(image_dir):
-        os.makedirs(image_dir)
-    variation_urls = [datum.url for datum in variation_response.data]  # Extract URLs
-    variation_images = [requests.get(url).content for url in variation_urls]  # Download images
-    variation_image_names = [f"variation_image_{i}.png" for i in range(len(variation_images))]  # Create names
-    variation_image_filepaths = [os.path.join(image_dir, name) for name in variation_image_names]  # Create filepaths
-    for image, filepath in zip(variation_images, variation_image_filepaths):  # Loop through the variations
-        with open(filepath, "wb") as image_file:  # Open the file
-            image_file.write(image)  # Write the image to the file
+            except OpenAIError as e:
+                st.error(f"An error occurred: {str(e)}")
+            except KeyError:
+                st.error("OpenAI API key is not set. Please set it in Streamlit's advanced settings.")
 
-    # Print the variation image filepaths
-    for filepath in variation_image_filepaths:
-        st.write(filepath)
+else:
+    st.write("Please upload both an image and a mask.")
