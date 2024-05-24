@@ -9,10 +9,9 @@ import os
 # Set the API key and model name
 openai.api_key = st.secrets["openai_api_key"]
 MODEL = "gpt-4o"
+client = openai.Client()
 
 def analyze_image(image):
-    client = openai.Client()
-
     # Encode the image as base64
     image_base64 = base64.b64encode(image).decode("utf-8")
     image_url = f"data:image/jpeg;base64,{image_base64}"
@@ -37,14 +36,11 @@ def analyze_image(image):
     return mood, color_choice
 
 def generate_image(emotion, color_choice):
-    client = openai.Client()
-
     # Create an image using the DALL-E 3 model
     response = client.images.generate(
         prompt=f"{emotion} {color_choice} aura",
         model="dalle3",
         response_format="b64_json",
-        image_url=[{"type": "image_url", "image_url": image_url}]], # <-- fixed
     )
 
     # Decode the image from base64 and return it
@@ -57,3 +53,32 @@ st.title("Make Me Glow Up")
 
 # Upload an image of a person
 image_file = st.file_uploader("Upload an image of a person", type=["jpg", "jpeg", "png"])
+
+if image_file:
+    # Load the image using PIL
+    image = Image.open(image_file)
+
+    # Display the original image
+    st.subheader("Original Image")
+    st.image(image)
+
+    # Analyze the image
+    mood, color_choice = analyze_image(image)
+
+    # Display the mood and color
+    st.subheader("Mood and Color")
+    st.write(f"Mood: {mood}")
+    st.write(f"Color: {color_choice}")
+
+    # Generate the aura image
+    aura_image = generate_image(mood, color_choice)
+
+    # Convert the aura image to PIL format
+    aura_image = Image.fromarray(np.uint8(aura_image))
+
+    # Display the aura image
+    st.subheader("Aura Image")
+    st.image(aura_image)
+
+    # Save the aura image
+    aura_image.save("aura_image.png")
