@@ -14,8 +14,20 @@ uploaded_image = st.file_uploader("Upload an image", type="png")
 uploaded_mask = st.file_uploader("Upload a mask", type="png")
 
 if uploaded_image is not None and uploaded_mask is not None:
-    st.image(uploaded_image, caption="Uploaded Image", width=300)
-    st.image(uploaded_mask, caption="Uploaded Mask", width=300)
+    # Resize the uploaded images to reduce their file size
+    max_size = (1024, 1024)
+    resized_image = uploaded_image.read().decode("utf-8")
+    image = Image.open(resized_image)
+    image.thumbnail(max_size)
+    resized_image = image.tobytes()
+
+    resized_mask = uploaded_mask.read().decode("utf-8")
+    mask = Image.open(resized_mask)
+    mask.thumbnail(max_size)
+    resized_mask = mask.tobytes()
+
+    st.image(resized_image, caption="Uploaded Image", width=300)
+    st.image(resized_mask, caption="Uploaded Mask", width=300)
     prompt_input = st.text_input("Enter prompt:", value="", max_chars=100)
 
     # Edit the image using OpenAI
@@ -25,13 +37,10 @@ if uploaded_image is not None and uploaded_mask is not None:
                 # Use the previously loaded OpenAI API key
                 client = OpenAI(api_key=openai_api_key)
 
-                # Read the uploaded image and mask data as bytes
-                image_data = uploaded_image.read()
-                mask_data = uploaded_mask.read()
-
+                # Send the resized image and mask data to the OpenAI API
                 response = client.images.edit(
-                    image=image_data,
-                    mask=mask_data,
+                    image=resized_image,
+                    mask=resized_mask,
                     prompt=prompt_input,
                     n=1,
                     size="1024x1024",
@@ -51,4 +60,3 @@ if uploaded_image is not None and uploaded_mask is not None:
 
 else:
     st.write("Please upload both an image and a mask.")
-
