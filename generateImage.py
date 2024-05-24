@@ -6,8 +6,8 @@ from PIL import Image
 import base64
 import os
 
-# Set the API key and model name
-openai.api_key = st.secrets["openai_api_key"]
+# Load OpenAI API key from secrets.toml
+openai_api_key = st.secrets["OPENAI_API_KEY"]
 MODEL = "gpt-4o"
 client = openai.Client()
 
