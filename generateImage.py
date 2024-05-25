@@ -19,19 +19,12 @@ def get_response(base64_image):
     ]
 
     try:
-        response = openai.api_requestor.APIRequestor().request(
-            "post",
-            f"/v1/completions",
-            json={
-                "model": MODEL,
-                "prompt": messages,
-                "temperature": 0.0,
-            },
-            headers={
-                "Authorization": f"Bearer {openai_api_key}",
-            },
+        response = openai.api_resources.chat.ChatCompletion.create(
+            model=MODEL,
+            messages=messages,
+            temperature=0.0
         )
-        return response.json()["choices"][0]["text"]
+        return response['choices'][0]['message']['content']
     except Exception as e:
         return f"Error: {str(e)}"
 
