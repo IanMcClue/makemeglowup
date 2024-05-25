@@ -15,11 +15,14 @@ def get_response(base64_image):
     # Constructing the messages with the base64 image data
     messages = [
         {"role": "system", "content": "You are a helpful assistant that determines the user's emotion and the color they give off based on the uploaded image."},
-        {"role": "user", "content": f"Here's an image (base64-encoded): {base64_image}. What is the user's emotion and the color they give off?"}
+        {"role": "user", "content": [
+            {"type": "text", "text": "Here's an image. What is the user's emotion and the color they give off?"},
+            {"type": "image_url", "image_url": f"data:image/png;base64,{base64_image}"}
+        ]}
     ]
 
     try:
-        response = openai.api_resources.chat.ChatCompletion.create(
+        response = openai.ChatCompletion.create(
             model=MODEL,
             messages=messages,
             temperature=0.0
