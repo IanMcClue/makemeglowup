@@ -2,6 +2,7 @@ import streamlit as st
 import base64
 import openai
 from PIL import Image
+import io
 
 # Function to encode image to base64
 def encode_image(image_file):
@@ -17,10 +18,7 @@ def get_response(base64_image):
     # Constructing the messages with the base64 image data
     messages = [
         {"role": "system", "content": "You are a helpful assistant that determines the user's emotion and the color they give off based on the uploaded image."},
-        {"role": "user", "content": [
-            {"type": "text", "text": "Here's an image. What's the user's emotion and the color they give off?"},
-            {"type": "image_url", "image_url": f"data:image/png;base64,{base64_image}"}
-        ]}
+        {"role": "user", "content": f"Here's an image (base64-encoded): {base64_image}. What is the user's emotion and the color they give off?"}
     ]
 
     try:
