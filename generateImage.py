@@ -3,7 +3,10 @@ from openai import OpenAI
 
 # Initialize OpenAI client
 client = OpenAI()
-client.api_key = "your_api_key_here"  # Replace with your actual API key
+
+# Get the API key from Streamlit secrets
+api_key = st.secrets["OPEN_API_KEY"]  # Replace "OPEN_API_KEY" with the actual key in your secrets.toml file
+client.api_key = api_key
 
 # Initialize Streamlit app
 st.title("Poetic Programming Explanations")
