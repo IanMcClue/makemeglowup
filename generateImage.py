@@ -1,12 +1,9 @@
 import streamlit as st
 from openai import OpenAI
 
-# Initialize OpenAI client
+# Initialize OpenAI client and set the API key
+OpenAI.api_key = st.secrets["OPENAI_API_KEY"]  # Replace "OPENAI_API_KEY" with the actual key in your secrets.toml file
 client = OpenAI()
-
-# Get the API key from Streamlit secrets
-api_key = st.secrets["OPEN_API_KEY"]  # Replace "OPEN_API_KEY" with the actual key in your secrets.toml file
-client.api_key = api_key
 
 # Initialize Streamlit app
 st.title("Poetic Programming Explanations")
