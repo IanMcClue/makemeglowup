@@ -29,11 +29,3 @@ def get_response(base64_image):
 st.title('Emotion and Color Image Processing')
 
 image_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
-
-if image_file:
-    image = Image.open(image_file)
-    st.image(image, caption='Uploaded Image', use_column_width=True)
-
-    base64_image = encode_image(image_file)
-    response = get_response(base64_image)
-    st.markdown(response, unsafe_allow_html=True)
