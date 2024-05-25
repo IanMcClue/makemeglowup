@@ -3,9 +3,8 @@ import base64
 import openai
 from PIL import Image
 
-def encode_image(image_path):
-    with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode("utf-8")
+def encode_image(image_file):
+    return base64.b64encode(image_file.read()).decode("utf-8")
 
 def get_response(base64_image):
     # Load OpenAI API key from secrets.toml
@@ -36,6 +35,6 @@ if image_file:
     image = Image.open(image_file)
     st.image(image, caption='Uploaded Image', use_column_width=True)
 
-    base64_image = encode_image(image_file.name)
+    base64_image = encode_image(image_file)
     response = get_response(base64_image)
     st.markdown(response, unsafe_allow_html=True)
