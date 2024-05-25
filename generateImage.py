@@ -7,7 +7,7 @@ def encode_image(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
 
-def get_response(base64_image, emotion, color):
+def get_response(base64_image):
     # Load OpenAI API key from secrets.toml
     openai_api_key = st.secrets["OPENAI_API_KEY"]
     MODEL = "gpt-4o"
@@ -16,9 +16,9 @@ def get_response(base64_image, emotion, color):
     response = client.chat.completions.create(
         model=MODEL,
         messages=[
-            {"role": "system", "content": "You are a helpful assistant that responds to images, emotions, and colors."},
+            {"role": "system", "content": "You are a helpful assistant that determines the user's emotion and the color they give off based on the uploaded image."},
             {"role": "user", "content": [
-                {"type": "text", "text": f"Here's an image. The user is feeling {emotion} and their favorite color is {color}."},
+                {"type": "text", "text": "Here's an image. What's the user's emotion and the color they give off?"},
                 {"type": "image_url", "image_url": {
                     "url": f"data:image/png;base64,{base64_image}"}
                 }
@@ -31,13 +31,11 @@ def get_response(base64_image, emotion, color):
 st.title('Emotion and Color Image Processing')
 
 image_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
-emotion = st.text_input("Enter your current emotion")
-color = st.text_input("Enter your favorite color")
 
-if image_file and emotion and color:
+if image_file:
     image = Image.open(image_file)
     st.image(image, caption='Uploaded Image', use_column_width=True)
 
     base64_image = encode_image(image_file.name)
-    response = get_response(base64_image, emotion, color)
+    response = get_response(base64_image)
     st.markdown(response, unsafe_allow_html=True)
