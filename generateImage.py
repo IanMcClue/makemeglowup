@@ -18,11 +18,10 @@ def get_response(base64_image):
             {"role": "system", "content": "You are a helpful assistant that determines the user's emotion and the color they give off based on the uploaded image."},
             {"role": "user", "content": [
                 {"type": "text", "text": "Here's an image. What's the user's emotion and the color they give off?"},
-                {"type": "image_url", "image_url": {
-                    "url": f"data:image/png;base64,{base64_image}"}
-                }
-            ]}
-        ]
+                {"type": "image_url", "image_url": f"data:image/png;base64,{base64_image}"}
+            ]}]
+        }
+    ]
     )
 
     return response.choices[0].message.content
