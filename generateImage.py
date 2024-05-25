@@ -7,7 +7,8 @@ def encode_image(image_file):
     return base64.b64encode(image_file.read()).decode("utf-8")
 
 def get_response(base64_image):
-    openai.api_key = st.secrets["OPENAI_API_KEY"]
+    # Create an instance of the OpenAI class
+    openai_instance = openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
     MODEL = "gpt-4.0"
 
@@ -18,7 +19,7 @@ def get_response(base64_image):
     ]
 
     try:
-        response = openai.ChatCompletion.create(
+        response = openai_instance.ChatCompletion.create(
             model=MODEL,
             messages=messages,
             temperature=0.0
