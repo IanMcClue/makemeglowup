@@ -7,7 +7,7 @@ def encode_image(image_file):
     return base64.b64encode(image_file.read()).decode("utf-8")
 
 def get_response(base64_image):
-    openai_api_key = st.secrets["OPENAI_API_KEY"]
+    openai.api_key = st.secrets["OPENAI_API_KEY"]
 
     MODEL = "gpt-4.0"
 
