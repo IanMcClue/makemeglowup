@@ -9,7 +9,7 @@ def encode_image(image_file):
 def get_response(base64_image):
     openai_api_key = st.secrets["OPENAI_API_KEY"]
 
-    MODEL = "gpt-4o"
+    MODEL = "gpt-4.0"
 
     # Constructing the messages with the base64 image data
     messages = [
@@ -23,7 +23,7 @@ def get_response(base64_image):
             messages=messages,
             temperature=0.0
         )
-        return response['choices'][0]['message']['content']
+        return response.choices[0].message['content']
     except Exception as e:
         return f"Error: {str(e)}"
 
