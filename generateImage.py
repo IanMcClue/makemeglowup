@@ -30,3 +30,18 @@ def get_response(base64_image):
 st.title('Emotion and Color Image Processing')
 
 image_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+
+if image_file is not None:
+    # Display the uploaded image
+    image = Image.open(image_file)
+    st.image(image, caption='Uploaded Image', use_column_width=True)
+
+    # Encode the image
+    base64_image = encode_image(image_file)
+    
+    # Get the response
+    response = get_response(base64_image)
+    
+    # Display the response
+    st.write("Response from the model:")
+    st.write(response)
