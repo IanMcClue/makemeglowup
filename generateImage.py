@@ -1,18 +1,17 @@
 import streamlit as st
-import openai
+from openai import OpenAI
 import requests
 from io import BytesIO
 from PIL import Image
 
 # Initialize OpenAI client and set the API key from Streamlit secrets
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+openai = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 def generate_image(prompt):
-    response = openai.Image.create(
-        model="dall-e-3",
+    response = openai.images.create(
+        model="image-alpha-001",  # DALL-E 2 model
         prompt=prompt,
         size="1024x1024",
-        quality="standard",
         n=1
     )
     image_url = response['data'][0]['url']
