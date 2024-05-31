@@ -7,13 +7,14 @@ from PIL import Image
 # Initialize OpenAI client and set the API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
+# Initialize the client
+client = openai.Image
+
 def generate_image(prompt):
-    response = client.images.generate(
-        model="image-alpha-001",  # DALL-E model identifier
+    response = client.create(
         prompt=prompt,
-        size="1024x1024",
-        response_format="url",
-        n=1
+        n=1,
+        size="1024x1024"
     )
     image_url = response['data'][0]['url']
     return image_url
