@@ -8,7 +8,7 @@ from PIL import Image
 openai = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 def generate_image(prompt):
-    response = openai.images.create(
+    response = openai.Image.create(
         model="image-alpha-001",  # DALL-E 2 model
         prompt=prompt,
         size="1024x1024",
