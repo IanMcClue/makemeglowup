@@ -9,9 +9,11 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 def generate_image(prompt):
     response = openai.Image.create(
+        model="dall-e-3",
         prompt=prompt,
-        n=1,
-        size="1024x1024"
+        size="1024x1024",
+        quality="standard",
+        n=1
     )
     image_url = response['data'][0]['url']
     return image_url
