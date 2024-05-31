@@ -9,8 +9,8 @@ client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 def test_openai_api():
     try:
-        # Make a simple request to the API
-        response = client.Usage.retrieve()
+        # Make a simple request to the API to check if it's working
+        response = client.files.list_files()
         st.write("OpenAI API initialized successfully!")
     except Exception as e:
         st.write("Error initializing OpenAI API:", e)
