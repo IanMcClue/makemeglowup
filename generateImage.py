@@ -5,13 +5,10 @@ from io import BytesIO
 from PIL import Image
 
 # Initialize OpenAI client and set the API key
-openai.api_key = st.secrets["OPENAI_API_KEY"]
-
-# Initialize the client
-client = openai.Image
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 def generate_image(client, model_choice, prompt):
-    response = client.generate(
+    response = client.Image.generate(
         model=model_choice,
         prompt=prompt,
         size="1024x1024",
