@@ -12,7 +12,7 @@ client = OpenAI(api_key=openai_api_key)
 def test_openai_api():
     try:
         # Make a simple request to the API to check if it's working
-        response = client.list_engines()  # Use the correct method to test the API
+        response = openai.Engine.list()  # Use the correct method to test the API
         st.write("OpenAI API initialized successfully!")
     except Exception as e:
         st.write("Error initializing OpenAI API:", e)
