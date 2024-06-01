@@ -6,6 +6,7 @@ import os
 # Initialize OpenAI client and set the API key from Streamlit secrets
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=openai_api_key)
+MODEL = "gpt-4o"
 
 # Function to encode image to base64
 def encode_image(image_path):
@@ -34,11 +35,11 @@ def main():
         # Generate description using OpenAI GPT-4
         if st.button("Generate Description"):
             # Use the client to make a request with the specified model
-            completion = client.chat.completions.create(
-                model="gpt-4o",
+            completion = client.chat_completions.create(
+                model=MODEL,
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant. Describe the following image."},
-                    {"role": "user", "content": f"Here is the image: {base64_image}"}
+                    {"role": "user", "content": f"Here is the image: data:image/jpeg;base64,{base64_image}"}
                 ]
             )
             st.write("Description:")
