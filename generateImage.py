@@ -36,7 +36,7 @@ def main():
         if st.button("Generate Description"):
             # Use the client to make a request with the specified model
             response = client.chat.completions.create(
-                model=MODEL,
+                model="gpt-4o",
                 prompt=f"Describe the following image in a few words: {base64_image}",
                 max_tokens=200,
                 temperature=0.5,
