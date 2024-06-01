@@ -36,13 +36,13 @@ def main():
         if st.button("Generate Description"):
             # Use the client to make a request with the specified model
             response = client.chat.completions.create(
-                model="gpt-4o",
-                prompt=f"Describe the following image in a few words: {base64_image}",
+                messages=[{"role": "user", "content": f"Describe the following image in a few words: {base64_image}"}],
+                model=MODEL,
                 max_tokens=200,
                 temperature=0.5,
             )
             st.write("Description:")
-            st.write(response.choices[0].text.strip())
+            st.write(response.choices[0].message["content"].strip())
 
 if __name__ == "__main__":
     main()
