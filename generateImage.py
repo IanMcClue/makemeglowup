@@ -7,6 +7,9 @@ import os
 MODEL = "gpt-4o"
 OpenAI.api_key = st.secrets["OPENAI_API_KEY"]
 
+# define the client
+client = openai
+
 # Function to encode image to base64
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
