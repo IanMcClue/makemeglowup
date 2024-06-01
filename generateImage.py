@@ -4,42 +4,44 @@ import base64
 import os
 
 # Initialize OpenAI client and set the API key from Streamlit secrets
-MODEL = "gpt-4o"
 openai_api_key = st.secrets["OPENAI_API_KEY"]
-openai = OpenAI(api_key=openai_api_key)
+openai.api_key = openai_api_key
 
-# Function to encode image as base64
+# Function to encode image to base64
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
 
-# Display a file uploader in Streamlit
-uploaded_file = st.file_uploader("Choose an image...", type="png")
-if uploaded_file is not None:
-    st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
-    
-    # Save the uploaded file to a temporary location
-    temp_image_path = "temp_image.png"
-    with open(temp_image_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
-    
-    base64_image = encode_image(temp_image_path)
-    
-    # Make a request to the OpenAI API
-    response = openai.chat.completions.create(
-        model=MODEL,
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant that responds in Markdown. Help me with my math homework!"},
-            {"role": "user", "content": [
-                {"type": "text", "text": "What's the area of the triangle?"},
-                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{base64_image}"}}
-            ]}
-        ],
-        temperature=0.0,
-    )
-    
-    # Display the response from OpenAI
-    st.markdown(response.choices[0].message.content)
-    
-    # Remove the temporary image file
-    os.remove(temp_image_path)
+# Streamlit app
+def main():
+    st.title("Image Description Generator")
+
+    # File uploader
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+
+    if uploaded_file is not None:
+        # Convert the file to an image path
+        image_path = "temp_image.jpg"  # Temporary file path
+        with open(image_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+
+        # Encode the image to base64
+        base64_image = encode_image(image_path)
+
+        # Display the image
+        st.image(image_path, caption='Uploaded Image', use_column_width=True)
+
+        # Generate description using OpenAI GPT-4o
+        if st.button("Generate Description"):
+            # Assuming 'client' is defined and follows the pattern from your documentation
+            response = openai.Completion.create(
+                model="text-davinci-003",  # Update this with the correct GPT-4 model when available
+                prompt=f"Describe the following image: {base64_image}",
+                max_tokens=200,
+                temperature=0.5,
+            )
+            st.write("Description:")
+            st.write(response.choices[0].text.strip())
+
+if __name__ == "__main__":
+    main()
