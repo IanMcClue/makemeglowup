@@ -8,7 +8,7 @@ from PIL import Image
 openai = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 def generate_image(client, model_choice, prompt):
-    response = client.images.generate(
+    response = client.images.create(
         model=model_choice,
         prompt=prompt,
         size="1024x1024",
