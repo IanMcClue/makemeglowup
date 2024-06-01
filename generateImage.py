@@ -35,14 +35,15 @@ def main():
         # Generate description using OpenAI GPT-4
         if st.button("Generate Description"):
             # Use the client to make a request with the specified model
-            response = client.chat.completions.create(
-                messages=[{"role": "user", "content": f"Describe the following image in a few words: {base64_image}"}],
+            completion = client.chat.completions.create(
                 model=MODEL,
-                max_tokens=200,
-                temperature=0.5,
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant. Describe the following image."},
+                    {"role": "user", "content": f"Here is the image: {base64_image}"}
+                ]
             )
             st.write("Description:")
-            st.write(response.choices[0].message["content"].strip())
+            st.write(completion.choices[0].message["content"].strip())
 
 if __name__ == "__main__":
     main()
