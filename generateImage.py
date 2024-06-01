@@ -20,6 +20,8 @@ def main():
     # File uploader
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
+    response = None  # Declare response variable outside the if block
+
     if uploaded_file is not None:
         # Convert the file to an image path
         image_path = "temp_image.jpg"  # Temporary file path
@@ -45,9 +47,10 @@ def main():
             st.write("Description:")
             st.write(response.choices[0].message)
 
-    # Writing the content properly
-    st.write("Description:")
-    st.write(response.choices[0].message.content.strip())
+    if response is not None:  # Check if response is not None before accessing it
+        # Writing the content properly
+        st.write("Description:")
+        st.write(response.choices[0].message.content.strip())
 
 if __name__ == "__main__":
     main()
