@@ -35,7 +35,7 @@ def main():
         # Generate description using OpenAI GPT-4
         if st.button("Generate Description"):
             # Use the client to make a request with the specified model
-            completion = client.chat_completions.create(
+            response = client.chat.completions.create(
                 model=MODEL,
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant. Describe the following image."},
