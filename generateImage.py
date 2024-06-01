@@ -37,7 +37,7 @@ def main():
             model = "gpt-4o"  # Replace with the actual model ID you have access to
 
             # Use the client to make a request with the specified model
-            response = client.Completion.create
+            response = client.Completion.create(
                 model=MODEL,
                 prompt=f"Describe the following image in a few words: {base64_image}",
                 max_tokens=200,
