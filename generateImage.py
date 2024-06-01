@@ -32,7 +32,8 @@ def main():
 
         # Generate description using OpenAI GPT-4o
         if st.button("Generate Description"):
-            response = openai.Completion.create(
+            # Assuming 'client' is defined and follows the pattern from your documentation
+            response = client.Completion.create(
                 model="gpt-4o",  # Specify the model here
                 prompt=f"Describe the following image: {base64_image}",
                 max_tokens=200
