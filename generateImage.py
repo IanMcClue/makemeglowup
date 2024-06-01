@@ -5,7 +5,7 @@ import os
 
 # Initialize OpenAI client and set the API key from Streamlit secrets
 MODEL = "gpt-4o"
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+OpenAI.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Function to encode image to base64
 def encode_image(image_path):
