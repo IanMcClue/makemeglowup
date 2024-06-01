@@ -43,7 +43,11 @@ def main():
                 ]
             )
             st.write("Description:")
-            st.write(response.choices[0].message["content"].strip())
+            st.write(response.choices[0].message)
+
+    # Writing the content properly
+    st.write("Description:")
+    st.write(response.choices[0].message.content.strip())
 
 if __name__ == "__main__":
     main()
