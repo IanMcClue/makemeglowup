@@ -1,7 +1,7 @@
 import streamlit as st
 from openai import OpenAI
-from IPython.display import Image, display
 import base64
+import os
 
 # Initialize OpenAI client and set the API key from Streamlit secrets
 MODEL = "gpt-4o"
@@ -19,10 +19,11 @@ if uploaded_file is not None:
     st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
     
     # Save the uploaded file to a temporary location
-    with open("temp_image.png", "wb") as f:
+    temp_image_path = "temp_image.png"
+    with open(temp_image_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
     
-    base64_image = encode_image("temp_image.png")
+    base64_image = encode_image(temp_image_path)
     
     # Make a request to the OpenAI API
     response = openai.chat.completions.create(
@@ -39,3 +40,6 @@ if uploaded_file is not None:
     
     # Display the response from OpenAI
     st.markdown(response.choices[0].message.content)
+    
+    # Remove the temporary image file
+    os.remove(temp_image_path)
