@@ -4,11 +4,9 @@ import base64
 import os
 
 # Initialize OpenAI client and set the API key from Streamlit secrets
+openai_api_key = st.secrets["OPENAI_API_KEY"]
+openai = OpenAI(api_key=openai_api_key)
 MODEL = "gpt-4o"
-OpenAI.api_key = st.secrets["OPENAI_API_KEY"]
-
-# define the client
-client = openai
 
 # Function to encode image to base64
 def encode_image(image_path):
@@ -36,9 +34,6 @@ def main():
 
         # Generate description using OpenAI GPT-4
         if st.button("Generate Description"):
-            # Set the model to "gpt-4o" when making the API call
-            model = "gpt-4o"  # Replace with the actual model ID you have access to
-
             # Use the client to make a request with the specified model
             response = client.Completion.create(
                 model=MODEL,
