@@ -31,7 +31,7 @@ def main():
         # Display the uploaded image
         st.image(image_path, caption='Uploaded Image', use_column_width=True)
 
-        # Generate description using OpenAI GPT-4
+        # Generate description using OpenAI GPT-4o
         if st.button("Generate Description"):
             # Use the client to make a request with the specified model
             response = client.chat_completions.create(
