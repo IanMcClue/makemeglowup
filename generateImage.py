@@ -39,8 +39,12 @@ def main():
                 model=MODEL,
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": "Please describe the following image:"},
-                    {"role": "user", "content": f"data:image/jpeg;base64,{base64_image}"}
+                    {"role": "user", "content": [
+                        {"type": "text", "text": "Please describe the following image:"},
+                        {"type": "image_url", "image_url": {
+                            "url": f"data:image/jpeg;base64,{base64_image}"
+                        }}
+                    ]}
                 ]
             )
 
