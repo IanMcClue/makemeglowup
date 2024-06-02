@@ -1,6 +1,7 @@
 import streamlit as st
 from openai import OpenAI
 import base64
+import os
 
 # Initialize OpenAI client and set the API key from Streamlit secrets
 openai_api_key = st.secrets["OPENAI_API_KEY"]
@@ -19,36 +20,37 @@ def main():
     # File uploader
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
+    response = None  # Declare response variable outside the if block
+
     if uploaded_file is not None:
-        # Save the uploaded file to a temporary location
-        image_path = "temp_image.jpg"
+        # Convert the file to an image path
+        image_path = "temp_image.jpg"  # Temporary file path
         with open(image_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
 
         # Encode the image to base64
         base64_image = encode_image(image_path)
 
-        # Display the uploaded image
+        # Display the image
         st.image(image_path, caption='Uploaded Image', use_column_width=True)
 
-        # Generate description using OpenAI GPT-4o
+        # Generate description using OpenAI GPT-4
         if st.button("Generate Description"):
             # Use the client to make a request with the specified model
             response = client.chat.completions.create(
                 model=MODEL,
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": [
-                        {"type": "text", "text": "Please describe the following image:"},
-                        {"type": "image_url", "image_url": f"data:image/jpeg;base64,{base64_image}"}
-                    ]}
+                    {"role": "system", "content": "You are a helpful assistant. Describe the following image."},
+                    {"role": "user", "content": f"Here is the image: data:image/jpeg;base64,{base64_image}"}
                 ]
             )
-
-            # Display the response
-            description = response.choices[0].message['content']
             st.write("Description:")
-            st.write(description)
+            st.write(response.choices[0].message)
+
+    if response is not None:  # Check if response is not None before accessing it
+        # Writing the content properly
+        st.write("Description:")
+        st.write(response.choices[0].message.content.strip())
 
 if __name__ == "__main__":
     main()
