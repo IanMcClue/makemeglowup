@@ -45,12 +45,7 @@ def main():
                 ]
             )
             st.write("Description:")
-            st.write(response.choices[0].message)
-
-    if response is not None:  # Check if response is not None before accessing it
-        # Writing the content properly
-        st.write("Description:")
-        st.write(response.choices[0].message.content.strip())
+            st.write(response.choices[0].message.content.strip())  # Removed the repeated check and write
 
 if __name__ == "__main__":
     main()
