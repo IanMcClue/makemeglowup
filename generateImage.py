@@ -1,12 +1,11 @@
 import streamlit as st
 from openai import OpenAI
 import base64
-import os
 
 # Initialize OpenAI client and set the API key from Streamlit secrets
 openai_api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=openai_api_key)
-MODEL = "gpt-4o"
+MODEL = "gpt-4"
 
 # Function to encode image to base64
 def encode_image(image_path):
@@ -20,32 +19,38 @@ def main():
     # File uploader
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
-    response = None  # Declare response variable outside the if block
-
     if uploaded_file is not None:
-        # Convert the file to an image path
-        image_path = "temp_image.jpg"  # Temporary file path
+        # Save the uploaded file to a temporary location
+        image_path = "temp_image.jpg"
         with open(image_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
 
         # Encode the image to base64
         base64_image = encode_image(image_path)
 
-        # Display the image
+        # Display the uploaded image
         st.image(image_path, caption='Uploaded Image', use_column_width=True)
 
         # Generate description using OpenAI GPT-4
         if st.button("Generate Description"):
             # Use the client to make a request with the specified model
-            response = client.chat.completions.create(
+            response = client.chat_completions.create(
                 model=MODEL,
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant. Describe the following image."},
-                    {"role": "user", "content": f"Here is the image: data:image/jpeg;base64,{base64_image}"}
+                    {"role": "user", "content": [
+                        {"type": "text", "text": "Here is the image:"},
+                        {"type": "image_url", "image_url": {
+                            "url": f"data:image/jpeg;base64,{base64_image}"}
+                        }
+                    ]}
                 ]
             )
+
+            # Display the response
+            description = response.choices[0].message['content']
             st.write("Description:")
-            st.write(response.choices[0].message.content.strip())  # Removed the repeated check and write
+            st.write(description)
 
 if __name__ == "__main__":
     main()
