@@ -37,12 +37,10 @@ def main():
             response = client.chat_completions.create(
                 model=MODEL,
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant. Describe the following image."},
+                    {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": [
-                        {"type": "text", "text": "Here is the image:"},
-                        {"type": "image_url", "image_url": {
-                            "url": f"data:image/jpeg;base64,{base64_image}"}
-                        }
+                        {"type": "text", "text": "Please describe the following image:"},
+                        {"type": "image_url", "image_url": f"data:image/jpeg;base64,{base64_image}"}
                     ]}
                 ]
             )
