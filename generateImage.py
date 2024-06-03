@@ -68,14 +68,16 @@ def main():
                 temperature=0.0,
             )
             description = response.choices[0].message.content.strip()
+            st.session_state['description'] = description  # Store the description in session state
             st.write("Description:")
             st.write(description)
 
-            # Generate aura image using DALL-E 3
-            if st.button("Generate Aura Image"):
-                with st.spinner("Generating aura image..."):
-                    aura_image_url = generate_aura_image(description)
-                st.image(aura_image_url, caption='Generated Aura Image', use_column_width=True)
+    # Generate aura image using DALL-E 3
+    if 'description' in st.session_state:
+        if st.button("Generate Aura Image"):
+            with st.spinner("Generating aura image..."):
+                aura_image_url = generate_aura_image(st.session_state['description'])
+            st.image(aura_image_url, caption='Generated Aura Image', use_column_width=True)
 
 if __name__ == "__main__":
     main()
