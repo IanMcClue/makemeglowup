@@ -1,7 +1,6 @@
 import streamlit as st
 from openai import OpenAI
 import base64
-import os
 
 # Initialize OpenAI client and set the API key from Streamlit secrets
 openai_api_key = st.secrets["OPENAI_API_KEY"]
@@ -40,9 +39,13 @@ def main():
             response = client.chat.completions.create(
                 model=MODEL,
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant. Describe the following image."},
-                    {"role": "user", "content": f"Here is the image: data:image/jpeg;base64,{base64_image}"}
-                ]
+                    {"role": "system", "content": "You are a helpful assistant that responds in Markdown. Describe the following image."},
+                    {"role": "user", "content": [
+                        {"type": "text", "text": "Please describe the following image:"},
+                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
+                    ]}
+                ],
+                temperature=0.0,
             )
             st.write("Description:")
             st.write(response.choices[0].message.content.strip())  # Removed the repeated check and write
