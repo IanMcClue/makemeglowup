@@ -73,7 +73,8 @@ def main():
 
             # Generate aura image using DALL-E 3
             if st.button("Generate Aura Image"):
-                aura_image_url = generate_aura_image(description)
+                with st.spinner("Generating aura image..."):
+                    aura_image_url = generate_aura_image(description)
                 st.image(aura_image_url, caption='Generated Aura Image', use_column_width=True)
 
 if __name__ == "__main__":
